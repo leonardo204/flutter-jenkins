@@ -1,0 +1,32 @@
+{
+    "parameter": [
+        {
+            "name": "CHOOSE_STB",
+            "value": "ALL"
+        },
+        {
+            "name": "CHOOSE_TARGET",
+            "value": "all"
+        },
+        {
+            "name": "CHOOSE_VER",
+            "value": "0000"
+        },
+        {
+            "name": "CHOOSE_HASH",
+            "value": "0000"
+        },
+        {
+            "name": "CHOOSE_FTP_ID",
+            "value": "0000"
+        },
+        {
+            "name": "CHOOSE_FTP_PASSWD",
+            "value": "0000"
+        },
+        {
+            "name": "CHOOSE_FTP_USER_PATH",
+            "value": "0000"
+        }
+    ]
+}
