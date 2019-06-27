@@ -10,6 +10,7 @@ import 'package:jenkins/jsonProxy.dart';
 import 'package:jenkins/util/jsonManager.dart';
 import 'package:jenkins/tab/settingScreen.dart';
 import 'package:jenkins/util/custom_spinkit.dart';
+import 'package:web_socket_channel/io.dart';
 
 class BuildScreen extends StatefulWidget {
 
@@ -64,6 +65,8 @@ class _BuildScreen extends State<BuildScreen> with TickerProviderStateMixin {
 
   RefreshController _controller;
   AnimationController _anicontroller,_scaleController;
+  IOWebSocketChannel channel;
+  String gitCommit;
 
   @override
   void initState() {
@@ -82,6 +85,22 @@ class _BuildScreen extends State<BuildScreen> with TickerProviderStateMixin {
       }
     });
     _loadingActive = true;
+
+    channel = IOWebSocketChannel.connect("ws://10.70.0.39:1337");
+    print('channel: $channel');
+    if (channel != null) {
+      channel.stream.listen((data) {
+        print('recv: $data');
+        setState((){gitCommit = data;});
+      });
+    } else {
+      print("can't connect server");
+    }
+  }
+
+  void dispose() {
+    if (channel != null) channel.sink.close();
+    super.dispose();
   }
 
 
@@ -222,7 +241,10 @@ class _BuildScreen extends State<BuildScreen> with TickerProviderStateMixin {
 
   Future<void> _getStbLists(String site) async {
     print('select $site');
-      if (BuildScreen.bNetStatus) {
+
+    if(channel != null) channel.sink.add(site);
+
+    if (BuildScreen.bNetStatus) {
       JsonProxy jp = new JsonProxy();
       jp.getStbList(site).then((List l) => setStbs(l));
     } else {
@@ -417,6 +439,7 @@ class _BuildScreen extends State<BuildScreen> with TickerProviderStateMixin {
       newBoxes.clear();
       bSetBox = false;
       _loadingActive = false;
+      gitCommit = null;
     });
   }
 
@@ -627,6 +650,16 @@ class _BuildScreen extends State<BuildScreen> with TickerProviderStateMixin {
     );
   }
 
+  Widget getGitHash(){
+    return gitCommit==null?new Container():new Text(
+      gitCommit,
+      style: new TextStyle(
+        color: Colors.black,
+        fontSize: 10
+      ),
+    );
+  }
+
   Form _mainForm() {
     loadSettings();
 
@@ -637,6 +670,7 @@ class _BuildScreen extends State<BuildScreen> with TickerProviderStateMixin {
                   child: Column(
                     children: <Widget>[
                       getSiteForm(),
+                      getGitHash(),
                       getStbForm(),
                       getTargetForm(),
                       new Container(
