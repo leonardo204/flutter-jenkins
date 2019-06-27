@@ -81,6 +81,7 @@ class _BuildScreen extends State<BuildScreen> with TickerProviderStateMixin {
         _anicontroller.repeat();
       }
     });
+    _loadingActive = true;
   }
 
 
