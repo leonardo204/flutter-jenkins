@@ -11,8 +11,8 @@ class MonitorScreen extends StatefulWidget {
 class _MonitorScreen extends State<MonitorScreen> with TickerProviderStateMixin{
 
   RefreshController _controller;
-  var _count;
   AnimationController _anicontroller,_scaleController;
+  String msg;
 
   @override
   void initState() {
@@ -30,26 +30,18 @@ class _MonitorScreen extends State<MonitorScreen> with TickerProviderStateMixin{
         _anicontroller.repeat();
       }
     });
-    _count = 0;
   }
 
-  void _onRefresh() {
+  void dispose() {
+    super.dispose();
+  }
+
+  void _onRefresh() async {
     print('refresh');
-    Future.delayed(const Duration(seconds: 1)).then((onValue) {
+    Future.delayed(const Duration(milliseconds: 500)).then((onValue) {
       _controller.refreshCompleted();
-      setState(() => _count++);
-    });
-  }
-
-  void _onLoading() {
-      print('loading');
-    Future.delayed(const Duration(seconds: 1)).then((onValue) {
-      Center(
-        child: new Container(
-          child: new Text('loading....'),
-        ),
-      );
-      _controller.loadComplete();
+      setState(() {
+      });
     });
   }
 
@@ -69,7 +61,6 @@ class _MonitorScreen extends State<MonitorScreen> with TickerProviderStateMixin{
         enablePullDown: true,
         enablePullUp: true,
         onRefresh: _onRefresh,
-        onLoading: _onLoading,
         header: CustomHeader(
           refreshStyle: RefreshStyle.Behind,
           builder: (c,m){
@@ -95,7 +86,7 @@ class _MonitorScreen extends State<MonitorScreen> with TickerProviderStateMixin{
         ),
         child: new Center(
           child: new Padding(
-            child: new Text('Monitor... ${_count}'),
+            child: msg==null?new Text('ready'):new Text(msg),
             padding: EdgeInsets.all(20),
           ),
         ),

@@ -88,6 +88,10 @@ class _BuildScreen extends State<BuildScreen> with TickerProviderStateMixin {
 
     channel = IOWebSocketChannel.connect("ws://10.70.0.39:1337");
     print('channel: $channel');
+    listen();
+  }
+
+  void listen() {
     if (channel != null) {
       channel.stream.listen((data) {
         print('recv: $data');
@@ -110,8 +114,9 @@ class _BuildScreen extends State<BuildScreen> with TickerProviderStateMixin {
         controller: _controller,
         onOffsetChange: _onOffsetChange,
         enablePullDown: true,
-        enablePullUp: true,
+        enablePullUp: false,
         onRefresh: _onRefresh,
+        onLoading: _onLoading,
         header: CustomHeader(
           refreshStyle: RefreshStyle.Behind,
           builder: (c,m){
@@ -145,6 +150,10 @@ class _BuildScreen extends State<BuildScreen> with TickerProviderStateMixin {
 
     await checkNetwork(false).then((s) {
 
+      if (channel == null) {
+        channel = IOWebSocketChannel.connect("ws://10.70.0.39:1337");
+        listen();
+      }
       setState(() {
         if(BuildScreen.bNetStatus) m_color = Colors.blue;
         else m_color = Colors.grey;
@@ -153,7 +162,10 @@ class _BuildScreen extends State<BuildScreen> with TickerProviderStateMixin {
       _controller.refreshCompleted();
       print('refresh finished');
     });
+  }
 
+  void _onLoading() {
+    _controller.loadNoData();
   }
 
   void _onOffsetChange(bool up,double offset){
@@ -297,6 +309,7 @@ class _BuildScreen extends State<BuildScreen> with TickerProviderStateMixin {
                   _site = '';
                   _stb = '';
                   _target = '';
+                  gitCommit = null;
                   newBoxes.clear();
                   bSetBox = false;
                   _loadingActive = false;
@@ -440,6 +453,7 @@ class _BuildScreen extends State<BuildScreen> with TickerProviderStateMixin {
       bSetBox = false;
       _loadingActive = false;
       gitCommit = null;
+      channel = null;
     });
   }
 
